@@ -1,8 +1,10 @@
 ---
 layout: post
-title: k8s-command-cheatsheet
+title: K8S command cheatsheet
 categories: kubernetes cheatsheet
 ---
+
+This post is a cheatsheet of the `kubectl` and `minikube` commands.
 
 ## kubectl
 
