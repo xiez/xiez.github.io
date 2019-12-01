@@ -6,6 +6,14 @@ categories: kubernetes cheatsheet
 
 This post is a cheatsheet of the `kubectl` and `minikube` commands.
 
+## .bash_aliases
+
+```
+alias k='kubectl'
+alias mk='minikube'
+```
+
+
 ## kubectl
 
 ### Get/Describe Resource(s)
@@ -42,6 +50,12 @@ kubectl expose deployment/nginx-deployment  --type="NodePort" --port 80
 export NODE_PORT=$(kubectl get services/nginx-deployment -o go-template='{{(index .spec.ports 0).nodePort}}')
 echo NODE_PORT=$NODE_PORT
 curl -v $(minikube ip):$NODE_PORT
+```
+
+### Port forward
+
+```
+kubectl --namespace default port-forward grafana-1575089321-6f4b7f7875-lds7b 3000
 ```
 
 ### Scale Resource(s)
@@ -89,4 +103,5 @@ minikube dashboard
 # scp file to minikube virtual box
 scp -i ~/.minikube/machines/minikube/id_rsa  /tmp/dj.tar docker@$(minikube ip):~
 
+mk service django-service
 ```
