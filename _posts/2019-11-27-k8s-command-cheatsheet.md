@@ -46,6 +46,7 @@ kubectl expose deployment/nginx-deployment  --type="NodePort" --port 80
 ```
 
 ### Curl via Node Port
+
 ```
 export NODE_PORT=$(kubectl get services/nginx-deployment -o go-template='{{(index .spec.ports 0).nodePort}}')
 echo NODE_PORT=$NODE_PORT
@@ -55,7 +56,13 @@ curl -v $(minikube ip):$NODE_PORT
 ### Port forward
 
 ```
+# grafana
 kubectl --namespace default port-forward grafana-1575089321-6f4b7f7875-lds7b 3000
+
+# nginx
+export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=deis-workflow,app.kubernetes.io/instance=deis-workflow" -o jsonpath="{.items[0].metadata.name}")
+echo "Visit http://127.0.0.1:8080 to use your application"
+kubectl --namespace default port-forward $POD_NAME 8080:80
 ```
 
 ### Scale Resource(s)
