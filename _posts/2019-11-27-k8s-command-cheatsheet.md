@@ -19,21 +19,21 @@ alias mk='minikube'
 ### Get/Describe Resource(s)
 
 ```
-kubectl get all --all-namespaces
+k get all --all-namespaces
 
 # output format
-kubectl get pods -o wide
+k get pods -o wide
 
 # get in default namespace
-kubectl get pods
-kubectl get services
-kubectl get deployments
+k get pods
+k get services
+k get deployments
 
 # get in 'kube-system' namespace
-kubectl get pod coredns-9b8997588-87vtz --namespace kube-system
+k get pod coredns-9b8997588-87vtz --namespace kube-system
 
 # describe a resource
-kubectl describe services/nginx-deployment
+k describe services/nginx-deployment
 
 ```
 
@@ -41,7 +41,7 @@ kubectl describe services/nginx-deployment
 
 ```
 # create service
-kubectl expose deployment/nginx-deployment  --type="NodePort" --port 80
+k expose deployment/nginx-deployment  --type="NodePort" --port 80
 
 ```
 
@@ -57,58 +57,66 @@ curl -v $(minikube ip):$NODE_PORT
 
 ```
 # grafana
-kubectl --namespace default port-forward grafana-1575089321-6f4b7f7875-lds7b 3000
+k --namespace default port-forward grafana-1575089321-6f4b7f7875-lds7b 3000
 
 # nginx
 export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=deis-workflow,app.kubernetes.io/instance=deis-workflow" -o jsonpath="{.items[0].metadata.name}")
 echo "Visit http://127.0.0.1:8080 to use your application"
-kubectl --namespace default port-forward $POD_NAME 8080:80
+k --namespace default port-forward $POD_NAME 8080:80
 ```
 
 ### Scale Resource(s)
 
 ```
-kubectl scale deployments/nginx-deployment --replicas=4
+k scale deployments/nginx-deployment --replicas=4
 ```
 
 ### Set Resource(s)
 
 ```
-kubectl set image deployments/nginx-deployment nginx=nginx:latest
+k set image deployments/nginx-deployment nginx=nginx:latest
 ```
 
 ### Rollout Resource(s)
 
 ```
-kubectl rollout status deployments/nginx-deployment
+k rollout status deployments/nginx-deployment
 
 # undo in case failure
-kubectl rollout undo deployments/nginx-deployment
+k rollout undo deployments/nginx-deployment
 
 ```
 
 ### Exec commands
 
 ```
-kubectl exec -it kubernetes-dashboard-57f4cb4545-7ltsv --namespace=kubernetes-dashboard  sh
+k exec -it kubernetes-dashboard-57f4cb4545-7ltsv --namespace=kubernetes-dashboard  sh
 ```
 
 ## minikube
 
 ```
 # use custom image repo in case k8s.gcr.io is blocked, see https://github.com/kubernetes/minikube/pull/3714#issuecomment-514186245
-minikube start --image-repository=registry.cn-hangzhou.aliyuncs.com/google_containers
+mk start --image-repository=registry.cn-hangzhou.aliyuncs.com/google_containers
 
-minikube ip
+mk ip
 
-minikube ssh
+mk ssh
 
-minikube docker-env
+mk docker-env
 
-minikube dashboard
+mk dashboard
 
 # scp file to minikube virtual box
 scp -i ~/.minikube/machines/minikube/id_rsa  /tmp/dj.tar docker@$(minikube ip):~
 
 mk service django-service
+
+# set local docker CLI to point to the minikube docker daemon
+eval $(minikube docker-env)
+
+# set local docker CLI point back to local docker daemon
+eval $(minikube docker-env -u)
+
+
 ```
