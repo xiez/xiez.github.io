@@ -1,7 +1,11 @@
 ---
-layout: post
 title: Helm command cheatsheet
-categories: helm cheatsheet
+classes: wide
+categories:
+  - 2019-12
+tags:
+  - helm
+  - cheatsheet
 ---
 
 This post is a cheatsheet of the `helm` commands. [Helm](https://helm.sh/) is a package manager for Kubernetes, like apt/yum/homebrew for Kubernetes.
@@ -10,29 +14,26 @@ This post is a cheatsheet of the `helm` commands. [Helm](https://helm.sh/) is a 
 
 ### Add repo
 
-```
-
+```bash
 # use custom repo in China, see https://github.com/cloudnativeapp/charts
-helm repo add apphub https://apphub.aliyuncs.com
-
+$ helm repo add apphub https://apphub.aliyuncs.com
 ```
 
 ### Search a package
 
-```
-helm search repo mariadb
-
+```bash
+$ helm search repo mariadb
 ```
 
 ### Install a package
 
-```
-helm install happy-panda apphub/mariadb
+```bash
+$ helm install happy-panda apphub/mariadb
 ```
 
 **output:**
 
-```
+```bash
 NAME: happy-panda
 LAST DEPLOYED: Tue Dec  3 15:28:49 2019
 NAMESPACE: default
@@ -79,54 +80,52 @@ To upgrade this helm chart:
 
 ### Release status
 
-```
-helm status happy-panda
-
+```bash
+$ helm status happy-panda
 ```
 
 ### Show values
 
-```
-helm show values apphub/mariadb
+```bash
+$ helm show values apphub/mariadb
 ```
 
 ### Override values
 
-```
-echo '{mariadbUser: user0, mariadbDatabase: user0db}' > config.yaml
-helm install happy-panda -f config.yaml apphub/mariadb
+```bash
+$ echo '{mariadbUser: user0, mariadbDatabase: user0db}' > config.yaml
+$ helm install happy-panda -f config.yaml apphub/mariadb
 ```
 
 ### Upgrade/rollback release
 
-```
-helm upgrade -f config.yaml happy-panda apphub/mariadb
-
-helm rollback happy-panda 1
+```bash
+$ helm upgrade -f config.yaml happy-panda apphub/mariadb
+$ helm rollback happy-panda 1
 ```
 
 ### Release history
 
-```
-helm history happy-panda
+```bash
+$ helm history happy-panda
 ```
 
 ## Advance
 
 ### Create chart
 
-```
-helm create deis-workflow
+```bash
+$ helm create deis-workflow
 ```
 
 ### Package a chart
 
-```
-helm package deis-workflow
+```bash
+$ helm package deis-workflow
 ```
 
 ### Install zip package
 
-```
-helm install deis-workflow ./deis-workflow-0.1.0.tgz
+```bash
+$ helm install deis-workflow ./deis-workflow-0.1.0.tgz
 ```

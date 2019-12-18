@@ -1,7 +1,12 @@
 ---
-layout: post
 title: Develop with React.js and Django
-categories: django reactjs web-dev
+classes: wide
+categories:
+  - 2018-03
+tags:
+  - django
+  - reactjs
+  - web-dev
 ---
 
 这篇文章记录了从零搭建 Django 和 React.js 开发环境，并配置 Webpack 模块热替换的步骤。
@@ -76,7 +81,7 @@ django_react_proj
 $ python manage.py runserver
 ```
 
- ![django project img](../images/2018/03/runserver.jpg "python manage.py runserver")
+ ![django project img](../../assets/images/2018/03/runserver.jpg "python manage.py runserver")
 
 ### 增加 index 页面
 
@@ -133,7 +138,7 @@ TEMPLATES = [
 
 刷新页面
 
- ![hello django](../images/2018/03/hellodjango.jpg "hello django")
+ ![hello django](../../assets/images/2018/03/hellodjango.jpg "hello django")
 
 ### 创建 React 项目
 
@@ -289,9 +294,9 @@ INSTALLED_APPS = [
 {% endraw %}
 ```
 
-刷新页面后，浏览器会去加载`frontend/asserts/bundles/bundle.js`。说明 Django 已经可以把正确的`bundle.js`路径传给模板。
+刷新页面后，浏览器会去加载`frontend/assets/bundles/bundle.js`。说明 Django 已经可以把正确的`bundle.js`路径传给模板。
 
- ![bundlejs](../images/2018/03/bundlejs.jpg "bundlejs")
+ ![bundlejs](../../assets/images/2018/03/bundlejs.jpg "bundlejs")
 
 ### 修改 React App，增加 App 组件
 
@@ -324,7 +329,7 @@ $ ./node_modules/.bin/webpack-cli --config webpack.config.js
 
 成功后，刷新页面。此时，Django 和 ReactJS 已经调通。后续前端JS的改动，重新编译后，Django 会自动使用最新的 `assets/bundles/bundle.js`。
 
- ![reactjs](../images/2018/03/reactjs.jpg "reactjs")
+ ![reactjs](../../assets/images/2018/03/reactjs.jpg "reactjs")
 
 **`webpack` 增加`watch`选项，自动编译**
 
@@ -413,7 +418,7 @@ $ ./node_modules/.bin/webpack-dev-server --inline --progress --hot
 
 **最终效果**
 
-  ![hot reload](../images/2018/03/hotreload.gif "hot reload")
+  ![hot reload](../../assets/images/2018/03/hotreload.gif "hot reload")
 
 
 ## 示例代码
