@@ -16,13 +16,12 @@
 title: 郑勰
 email: xiez1989@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
-twitter_username: xiez
+ This blog records some bits of my daily life and work, as well as additional thoughts and feelings.
+twitter_username: xiez1989
 github_username: xiez
 minimal_mistakes_skin: dirt
 search: true
+logo: "/assets/images/mario.gif"
 
 # Build settings
 markdown: kramdown
@@ -33,7 +32,7 @@ remote_theme: "mmistakes/minimal-mistakes@4.17.2"
 permalink: /:categories/:title/
 paginate: 5 # amount of posts to show
 paginate_path: /page:num/
-timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timezone: Asia/Shanghai # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 include:
   - _pages
@@ -61,15 +60,19 @@ plugins:
 
 author:
   name   : "Justin Zheng's blog"
-  avatar : "https://avatars3.githubusercontent.com/u/1459699?s=400&v=4"
+  avatar : "/assets/images/bio-photo.jpg"
   bio    : "Software typically involves people"
+  location: "Beijing, China"
   links:
-    - label: "Website"
-      icon: "fas fa-fw fa-link"
-      url: "https://blog.justinzx.com/"
+    # - label: "Website"
+    #   icon: "fas fa-fw fa-link"
+    #   url: "https://blog.justinzx.com/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/xiez"
+    - label: "Stackoverflow"
+      icon: "fab fa-fw fa-stack-overflow"
+      url: "https://stackoverflow.com/users/1490421/xiez"
     # - label: "Instagram"
     #   icon: "fab fa-fw fa-instagram"
     #   url: "https://instagram.com/"
@@ -82,6 +85,9 @@ footer:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/xiez"
+    - label: "Stackoverflow"
+      icon: "fab fa-fw fa-stack-overflow"
+      url: "https://stackoverflow.com/users/1490421/xiez"
     # - label: "Instagram"
     #   icon: "fab fa-fw fa-instagram"
     #   url: "https://instagram.com/"
@@ -95,8 +101,11 @@ defaults:
       layout: single
       author_profile: true
       read_time: true
-      comments: true
-      share: true
+      comments:
+        provider: "disqus"
+        disqus:
+          shortname: "justinzx"
+      share: false
       related: true
   # _pages
   - scope:

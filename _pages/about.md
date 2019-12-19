@@ -4,12 +4,8 @@ title: "About"
 ---
 
 
-Some information about you!
+Hi! I'm Justin Zheng, a software engineer with more than 7 years of experience.
 
-### More Information
+I have strong interests in software engineering (both front and back ends), IoT and cloud computing.
 
-A place to include any other types of information that you'd like to include about yourself.
-
-### Contact me
-
-xiez1989 AT gmail DOT com
+You can contact me by sending email to xiez1989 AT gmail DOT com. You can also ping me on [Twitter](https://www.twitter.com/xiez1989).
