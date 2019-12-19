@@ -1,5 +1,5 @@
 ---
-title: Develop with React.js and Django
+title:  Django 和 React.js 集成开发环境
 classes: wide
 categories:
   - 2018-03
