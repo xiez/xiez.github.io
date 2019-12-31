@@ -10,25 +10,33 @@ tags:
 
 This post is a cheatsheet of the `helm` commands. [Helm](https://helm.sh/) is a package manager for Kubernetes, like apt/yum/homebrew for Kubernetes.
 
+## .bash_aliases
+
+```bash
+$ alias h='helm'
+```
+
 ## Basic
 
 ### Add repo
 
 ```bash
 # use custom repo in China, see https://github.com/cloudnativeapp/charts
-$ helm repo add apphub https://apphub.aliyuncs.com
+$ h repo add apphub https://apphub.aliyuncs.com
 ```
 
 ### Search a package
 
 ```bash
-$ helm search repo mariadb
+$ h search repo mariadb
 ```
 
 ### Install a package
 
 ```bash
-$ helm install happy-panda apphub/mariadb
+$ h install happy-panda apphub/mariadb
+
+$ h install my-coredns --namespace=default stable/coredns --version v1.7.3
 ```
 
 **output:**
@@ -81,33 +89,33 @@ To upgrade this helm chart:
 ### Release status
 
 ```bash
-$ helm status happy-panda
+$ h status happy-panda
 ```
 
 ### Show values
 
 ```bash
-$ helm show values apphub/mariadb
+$ h show values apphub/mariadb
 ```
 
 ### Override values
 
 ```bash
 $ echo '{mariadbUser: user0, mariadbDatabase: user0db}' > config.yaml
-$ helm install happy-panda -f config.yaml apphub/mariadb
+$ h install happy-panda -f config.yaml apphub/mariadb
 ```
 
 ### Upgrade/rollback release
 
 ```bash
-$ helm upgrade -f config.yaml happy-panda apphub/mariadb
-$ helm rollback happy-panda 1
+$ h upgrade -f config.yaml happy-panda apphub/mariadb
+$ h rollback happy-panda 1
 ```
 
 ### Release history
 
 ```bash
-$ helm history happy-panda
+$ h history happy-panda
 ```
 
 ## Advance
@@ -115,17 +123,54 @@ $ helm history happy-panda
 ### Create chart
 
 ```bash
-$ helm create deis-workflow
+$ h create deis-workflow
 ```
 
 ### Package a chart
 
 ```bash
-$ helm package deis-workflow
+$ h package deis-workflow
 ```
 
 ### Install zip package
 
 ```bash
-$ helm install deis-workflow ./deis-workflow-0.1.0.tgz
+$ h install deis-workflow ./deis-workflow-0.1.0.tgz
+```
+
+### Get release manifest
+
+```bash
+$ h get manifest happy-panda
+```
+
+### Install dry-run
+
+```bash
+$ h install clunky2 --debug --dry-run ./mychart/
+```
+
+### Lint a chart
+
+```bash
+$ h lint dnc-cloud-db/
+```
+
+### Pull a chart(helm v3 only)
+
+```bash
+$ h pull stable/coredns --version v1.7.2
+```
+
+### Push a chart
+
+```bash
+$ h push ./coredns/ chartmuseum-dev
+```
+
+### List & update dependency
+
+```bash
+$ h dep list
+$ h dep update
 ```
