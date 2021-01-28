@@ -45,6 +45,7 @@ class MigrationLoader(object):
 
 `MigrationGraph` 本质上就是项目里所有 migration 文件的依赖关系图。图中的每一个节点`Node`代表一个app下的migration文件，例如 `('app_A, '0001_auto_20190822_0806')`
 
+![dj_migration](https://github.com/xiez/xiez.github.io/raw/master/assets/images/2021/dj_mig.png)
 ```
 class MigrationGraph(object):
     """
@@ -559,3 +560,4 @@ class MigrationExecutor(object):
 ```
 
 至此，整个 `migrate` 操作完成。
+
