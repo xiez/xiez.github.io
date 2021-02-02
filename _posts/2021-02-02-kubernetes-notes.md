@@ -10,16 +10,16 @@ tags:
 
 ## API-Server
 
-职责：资源 CRUD
+**职责：资源 CRUD**
 
 
 ## Scheduler
 
-职责：资源调度（resource scheduling）
+**职责：资源调度（resource scheduling）**
 
 ## Controller
 
-职责：协调资源（reconcile resource)
+**职责：协调资源（reconcile resource)**
 
 类似自动化里的控制回路（control loop），调节系统的状态。
 
@@ -27,6 +27,7 @@ tags:
 
 [https://kubernetes.io/docs/concepts/architecture/controller/](https://kubernetes.io/docs/concepts/architecture/controller/)
 
+---
 
 使用水平触发（level trigger）方式使状态达到期望状态。
 
@@ -34,6 +35,7 @@ tags:
 
 [https://hackernoon.com/level-triggering-and-reconciliation-in-kubernetes-1f17fe30333d](https://hackernoon.com/level-triggering-and-reconciliation-in-kubernetes-1f17fe30333d)
 
+---
 
 Each component concentrates on its responsibilities. = There is no Orchestra conductor who controls the whole and gives instructions
 
@@ -49,9 +51,7 @@ Kubernetes = Edge-driven Trigger + Level-driven Trigger
 
 K8S 内建 API 对象的扩展，能动态注册到集群里，系统更可扩展和模块化。
 
-
 两种方式创建自定义资源:
-
 
 - CRDs are simple and can be created without any programming.
 
@@ -92,5 +92,5 @@ Operator 作为 K8S API 的客户端，充当 Custom Resource 的控制器的角
 
 - [https://docs.google.com/spreadsheets/d/10NltoF_6y3mBwUzQ4bcQLQfCE1BWSgUDcJXy-Qp2JEU/htmlview](https://docs.google.com/spreadsheets/d/10NltoF_6y3mBwUzQ4bcQLQfCE1BWSgUDcJXy-Qp2JEU/htmlview)
 
-- [https://www.infoq.cn/article/9DTX*1i1Z8hsxkdrPmhk](https://www.infoq.cn/article/9DTX*1i1Z8hsxkdrPmhk)
+- [https://github.com/caicloud/kube-ladder](https://github.com/caicloud/kube-ladder)
 
