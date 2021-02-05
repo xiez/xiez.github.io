@@ -88,10 +88,13 @@ ansible-playbook playbook.yml -l server1 -u ubuntu
 
 **通过 playbook 在3台全新的 ubuntu18.04 系统上安装 K8S 集群**
 
+
 ### 1. Edit ansible hosts
 
+使用本地的 hosts 文件: [https://github.com/xiez/ansible-playbooks/blob/master/hosts](https://github.com/xiez/ansible-playbooks/blob/master/hosts)
+
 ```
-xiez@xiez-Vostro-3470:~$ cat /etc/ansible/hosts
+xiez@xiez-Vostro-3470:~/dev/ansible-playbooks$ cat hosts
 [servers]
 server1 ansible_host=10.6.2.21
 server2 ansible_host=10.6.2.22
@@ -153,7 +156,7 @@ ansible-playbook -i hosts  06-setup_kube_master/playbook.yml
 ansible-playbook -i hosts  07-setup_kube_worker/playbook.yml
 ```
 
-#### 3.5
+#### 3.5 测试集群节点状态
 
 在 master 节点上执行 `get node`
 
