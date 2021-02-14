@@ -1,4 +1,13 @@
-# Django Migration 源码分析
+---
+title:  Django Migration 源码分析
+classes: wide
+categories:
+  - 2021-02
+tags:
+  - django
+---
+
+本文从源码层次分析下 Django Migration 系统的内部原理。
 
 ## Make Migrations
 

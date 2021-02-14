@@ -5,7 +5,10 @@ categories:
   - 2021-02
 tags:
   - kubernets
+type: note
 ---
+
+记录下学习和使用 K8S 过程中的一些心得，供以后参考。
 
 
 ## API-Server
@@ -74,6 +77,7 @@ CRD 使用起来简单，但灵活性不如 API Aggregation.
 
 Operator 作为 K8S API 的客户端，充当 Custom Resource 的控制器的角色。
 
+---
 
 ## Architecture
 

@@ -5,6 +5,7 @@ categories:
   - 2021-02
 tags:
   - ansible
+type: note
 ---
 
 Ansible 作为常见的配置管理（[Configuration Management](https://en.wikipedia.org/wiki/Configuration_management)）工具，相比 chef/puppet 的优势：

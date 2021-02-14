@@ -1,13 +1,13 @@
 ---
-title: "Posts by Year"
-permalink: /posts/
-layout: posts
+title: "Notes"
+permalink: /notes/
 author_profile: true
 ---
 
+
 <div class="">
   {% for post in site.posts %}
-    {% if post.type != 'note' %}
+    {% if post.type == 'note' %}
     <div class="list__item">
         <article class="archive__item" itemscope="" itemtype="https://schema.org/CreativeWork">
 
@@ -26,4 +26,3 @@ author_profile: true
     {% endif %}
   {% endfor %}
 </div>
-

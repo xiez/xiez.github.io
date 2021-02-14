@@ -1,0 +1,15 @@
+---
+layout: archive
+---
+
+{{ content }}
+
+<h3 class="archive__subtitle">{{ site.data.ui-text[site.locale].recent_posts | default: "All Posts" }}</h3>
+
+{% for post in paginator.posts %}
+  {% if post.type != 'note' %}
+  {% include archive-single.html %}
+  {% endif %}
+{% endfor %}
+
+{% include paginator.html %}
