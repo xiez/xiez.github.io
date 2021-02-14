@@ -2,7 +2,8 @@
 title:  Django Migration 源码分析
 classes: wide
 categories:
-  - 2021-02
+  - 2021-01
+words_per_minute: 60
 tags:
   - django
 ---

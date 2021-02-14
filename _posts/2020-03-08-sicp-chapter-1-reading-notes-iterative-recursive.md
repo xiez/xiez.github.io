@@ -3,6 +3,7 @@ title: SICP 第一章读书笔记 - 递归与迭代
 classes: wide
 categories:
   - 2020-03
+words_per_minute: 60
 tags:
   - SICP
   - Reading

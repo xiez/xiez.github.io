@@ -4,7 +4,7 @@ title: "About"
 ---
 
 
-Hi! I'm Justin Zheng, a software engineer with more than 7 years of experience.
+Hi! I'm Justin Zheng, a software engineer with more than 8 years of experience.
 
 I have strong interests in software engineering (both front and back ends), IoT and cloud computing.
 

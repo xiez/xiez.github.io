@@ -7,6 +7,8 @@ tags:
   - emacs
 ---
 
+在 Emacs 下开发会用到的一些插件和小技巧。
+
 ## Python Docker 开发
 
 参照 [https://emacs.stackexchange.com/questions/19431/tramp-method-for-docker](https://emacs.stackexchange.com/questions/19431/tramp-method-for-docker)， 修改 `.emacs`  TRAMP 相关配置：
@@ -38,7 +40,7 @@ tags:
 透明修改容器内 python 模块，保存后自动热加载，近似本地开发。
 
 
-## 小程序开发
+## 微信小程序开发
 
 配合 Win10 自带 Linux 子系统，实现在 linux 端开发小程序应用。
 
