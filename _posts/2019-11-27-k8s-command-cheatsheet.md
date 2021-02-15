@@ -50,7 +50,7 @@ $ k expose deployment/nginx-deployment  --type="NodePort" --port 80
 ### Curl via Node Port
 
 ```bash
-$ export NODE_PORT=$(kubectl get services/nginx-deployment -o go-template='{{(index .spec.ports 0).nodePort}}')
+$ export NODE_PORT=$(kubectl get services/nginx-deployment -o go-template='{\{(index .spec.ports 0).nodePort}}')
 $ echo NODE_PORT=$NODE_PORT
 $ curl -v $(minikube ip):$NODE_PORT
 ```

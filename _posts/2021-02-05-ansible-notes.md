@@ -61,7 +61,7 @@ server2 | SUCCESS => {
 }
 ```
 
-## 常用命令 & Cheetsheet
+## 常用命令 & Cheatsheet
 
 ```
 ansible servers -a "uptime" -u ubuntu
@@ -69,7 +69,7 @@ ansible servers -a "uptime" -u ubuntu
 ansible servers --become -m apt -a "name=vim state=latest" -u ubuntu
 ```
 
-Cheetsheet: [https://www.edureka.co/blog/cheatsheets/ansible-cheat-sheet-guide/](https://www.edureka.co/blog/cheatsheets/ansible-cheat-sheet-guide/)
+Cheatsheet: [https://www.edureka.co/blog/cheatsheets/ansible-cheat-sheet-guide/](https://www.edureka.co/blog/cheatsheets/ansible-cheat-sheet-guide/)
 
 ## Case study 1
 
