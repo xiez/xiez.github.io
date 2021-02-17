@@ -2,7 +2,7 @@
 title:  Ansible 笔记
 classes: wide
 categories:
-  - 2021-02
+  - 2020-03
 tags:
   - ansible
 type: note

@@ -8,7 +8,17 @@ tags:
   - django
 ---
 
-本文从源码层次分析下 Django Migration 系统的内部原理。
+Django Migration 主要用来自动化地变更数据库的 schema（新增表，新增字段，等），有点类似版本控制系统（git），只是控制的是数据库的 schema，而不是代码。主要分两部分：
+
+- `makemigrations`: 基于 models 的变更，来生成新的 migration 文件，存放到各个 app 下的 `migrations` 目录。
+
+- `migrate`: 把 migration 文件应用到数据库，也可以反向取消已应用的变更，类似 `git revert`
+
+主要流程如下图：
+
+![django migrations](https://github.com/xiez/xiez.github.io/raw/master/assets/images/2021/01/dj_migrations.png "django migrations")
+
+下面就从源码层次分析下 Django Migration 系统的内部原理，Django 版本为 v1.11。
 
 ## Make Migrations
 
@@ -55,7 +65,8 @@ class MigrationLoader(object):
 
 `MigrationGraph` 本质上就是项目里所有 migration 文件的依赖关系图。图中的每一个节点`Node`代表一个app下的migration文件，例如 `('app_A, '0001_auto_20190822_0806')`
 
-![dj_migration](https://github.com/xiez/xiez.github.io/raw/master/assets/images/2021/dj_mig.png)
+![migration graph](https://github.com/xiez/xiez.github.io/raw/master/assets/images/2021/01/migation_graph.png "migration graph")
+
 ```
 class MigrationGraph(object):
     """

@@ -4,23 +4,31 @@ classes: wide
 categories:
   - 2021-02
 tags:
-  - kubernets
+  - kubernetes
 type: note
 ---
 
-记录下学习和使用 K8S 过程中的一些心得，供以后参考。
+K8S 是分布式应用的编排器（orchestrator），无论是部署应用到云上还是内部（on-premise）机房，都需要打包应用，分发软件包，保证应用高可用，负载均衡流量等一系列环节。K8S 提供了一层抽象，屏蔽了这些复杂且容易出错的环节，让开发者能专心开发功能，只需要改动几个参数，就能让应用运行在几万台机器上。
+
+[这个视频](https://www.youtube.com/watch?v=q1PcAawa4Bg&list=PLLasX02E8BPCrIhFrc_ZiINhbRkYMKdPT&index=1)是 Brendan Burns 对 K8S 的介绍。
+
+未来的开发者们不需要关心应用是跑在云上还是内部（on-premise）环境，只需要适配 K8S，最后应用就可以在各种云环境或内部环境下运行，从而有效得避免了 Vendor lock-in。从这点看，K8S 有点类似云时代的 Linux，帮开发者屏蔽了底层的 CPU 架构。
+
+K8S 系统比较复杂，涉及到的组件很多，在这里记录下学习和使用过程中的一些心得，供以后参考。
 
 
-## API-Server
+## Components & Terms
+
+### API-Server
 
 **职责：资源 CRUD**
 
 
-## Scheduler
+### Scheduler
 
 **职责：资源调度（resource scheduling）**
 
-## Controller
+### Controller
 
 **职责：协调资源（reconcile resource)**
 
@@ -50,7 +58,7 @@ Kubernetes = Edge-driven Trigger + Level-driven Trigger
 
 [Inside of Kubernetes Controller.pdf](/assets/slides/Inside_of_Kubernetes_Controller.pdf)
 
-## Custom Resource
+### Custom Resource
 
 K8S 内建 API 对象的扩展，能动态注册到集群里，系统更可扩展和模块化。
 
@@ -66,7 +74,7 @@ The CustomResourceDefinition API resource allows you to define custom resources.
 
 CRD 使用起来简单，但灵活性不如 API Aggregation.
 
-## Operator Pattern
+### Operator Pattern
 
 某些需要人操作的事情（比如，创建deployment，创建PV/PVC等），可以通过 operator 来自动化完成，提高运维效率，减少出错几率。
 
