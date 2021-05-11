@@ -8,7 +8,7 @@ tags:
   - django
 ---
 
-Django Migration 主要用来自动化地变更数据库的 schema（新增表，新增字段，等），有点类似版本控制系统（git），只是控制的是数据库的 schema，而不是代码。主要分两部分：
+Django Migration 主要用来自动化地变更数据库的 schema（新增表，新增字段等等），有点类似版本控制系统（git），只是控制的是数据库的 schema，而不是代码。主要分为两部分：
 
 - `makemigrations`: 基于 models 的变更，来生成新的 migration 文件，存放到各个 app 下的 `migrations` 目录。
 

@@ -9,7 +9,7 @@ tags:
   - Reading
 ---
 
-花了三周左右时间读完了 "Structure and Interpretation of Computer Programs" 第一章，完成了大部分的[习题](https://github.com/xiez/SICP-exercises)，在这里记录下书中的一些精华段落，以及个人的一些感悟。
+花了三周左右时间读完了 "Structure and Interpretation of Computer Programs" 第一章，完成了大部分的[习题](https://github.com/xiez/SICP-exercises)，在这里记录下书中的一些精华段落，供以后参考。
 
 ## Iteration vs Recursion
 

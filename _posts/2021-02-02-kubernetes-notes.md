@@ -8,7 +8,7 @@ tags:
 type: note
 ---
 
-K8S 是分布式应用的编排器（orchestrator），无论是部署应用到云上还是内部（on-premise）机房，都需要打包应用，分发软件包，保证应用高可用，负载均衡流量等一系列环节。K8S 提供了一层抽象，屏蔽了这些复杂且容易出错的环节，让开发者能专心开发功能，只需要改动几个参数，就能让应用运行在几万台机器上。
+K8S 是分布式应用的编排器（orchestrator），无论是部署应用到云上还是内部（on-premise）机房，都需要打包应用，分发软件包，保证应用高可用，负载均衡流量等一系列复杂环节。K8S 提供了一层抽象，屏蔽了这些复杂且容易出错的环节，让开发者能专心开发功能，只需要改动几个参数，就能让应用运行在几万台机器上。
 
 [这个视频](https://www.youtube.com/watch?v=q1PcAawa4Bg&list=PLLasX02E8BPCrIhFrc_ZiINhbRkYMKdPT&index=1)是 Brendan Burns 对 K8S 的介绍。
 
