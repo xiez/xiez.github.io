@@ -1,5 +1,5 @@
 ---
-title: python import 问题排查
+title: Python import 问题排查
 classes: wide
 categories:
   - 2021-04
@@ -7,7 +7,6 @@ tags:
   - python
 ---
 
-## 问题
 
 今天在某个容器环境里执行 `python manage.py shell` 时遇到如下错误：
 
@@ -185,11 +184,11 @@ OK, 问题解决，耗时一小时左右。
 
 保持工具库的版本更新（至少补丁版本需要最新），不仅可以消除安全问题，还可以规避各种诡异的bug引起的时间投入。
 
-## 思考：引入 Implicit Namespace Package 真的好吗？
+## 思考：Implicit Namespace Package
 
 Implicit Namespace Package 解决的问题背景在[这篇PEP](https://www.python.org/dev/peps/pep-0402/#id9)以及 [Guido 的邮件](https://mail.python.org/pipermail/python-dev/2006-April/064400.html)里有介绍。
 
-正如[这篇帖子](https://stackoverflow.com/a/48804718/1490421)所讲，99%的情况下，我们需要的是 regular package，为了解决极少数的情况，从而增加语言本身的复杂度，真的好吗？
+正如[这篇帖子](https://stackoverflow.com/a/48804718/1490421)所讲，99%的情况下，我们需要的是 regular package，为了解决极少数的情况，引入了 Implicit Namespace Package 从而增加语言本身的复杂度，真的好吗？
 
 另外，附上 [Zen of Python](https://www.python.org/dev/peps/pep-0020/) 第二条:
 
