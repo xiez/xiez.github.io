@@ -8,6 +8,7 @@ tags:
   - concurrency
   - python
   - RaymondHettinger
+type: en
 ---
 
 Very intersting talk from Raymond Hettinger on Concurrency(multi-processing, threading, asyncio). And it's a pleasure to watch and listen to.

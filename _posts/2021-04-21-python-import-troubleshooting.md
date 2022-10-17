@@ -177,7 +177,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>>
 ```
 
-OK, 问题解决，耗时一小时左右。
+到此问题解决～
 
 
 ## 经验教训
@@ -188,9 +188,7 @@ OK, 问题解决，耗时一小时左右。
 
 Implicit Namespace Package 解决的问题背景在[这篇PEP](https://www.python.org/dev/peps/pep-0402/#id9)以及 [Guido 的邮件](https://mail.python.org/pipermail/python-dev/2006-April/064400.html)里有介绍。
 
-正如[这篇帖子](https://stackoverflow.com/a/48804718/1490421)所讲，99%的情况下，我们需要的是 regular package，为了解决极少数的情况，引入了 Implicit Namespace Package 从而增加语言本身的复杂度，真的好吗？
-
-另外，附上 [Zen of Python](https://www.python.org/dev/peps/pep-0020/) 第二条:
+正如[这篇帖子](https://stackoverflow.com/a/48804718/1490421)所讲，99%的情况下，我们需要的是 regular package，为了解决极少数的情况，引入了 Implicit Namespace Package 从而增加语言本身的复杂度，也许不是个明智的选择。毕竟 [Zen of Python](https://www.python.org/dev/peps/pep-0020/) 第二条就写了，
 
 > Explicit is better than implicit.
 

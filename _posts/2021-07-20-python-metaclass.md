@@ -8,13 +8,13 @@ tags:
   - metaclass
 ---
 
-Metaclass 国内翻译成「元类」，给人一种高深莫测的感觉，让第一次接触这个概念的人望而却步。
+Metaclass 国内一般译为成「元类」，属于面向对象里的进阶用法。
 
-`Meta` 一词根据 [wikipedia](https://en.wikipedia.org/wiki/Meta) 上的定义，一般用做前缀，例如，`metadata` (are data about data), `metaprogramming` (writing programs that manipulate programs), 所以，也可以同样定义 `metaclass` (are class that produce/manipulate class)
+`Meta` 一词根据 [wikipedia](https://en.wikipedia.org/wiki/Meta) 上的定义，一般用做前缀，例如，`metadata` (are data about data), `metaprogramming` (writing programs that manipulate programs), 所以，也可以同样定义 `metaclass` (are class that produce/manipulate classes)
 
-`metaclass` 也是一种类，它与 `class` 的关系就像 `class` 与 `object` 的关系，`metaclass` 可以改变它所生成的类的属性和行为。
+在 Python 里，`metaclass` 也是一种类，它与 `class` 的关系就像 `class` 与 `object` 的关系，`metaclass` 可以改变它所生成的类的属性和行为。
 
-下面以 python3 为例介绍 metaclass 的语法和使用场景。
+下面以 Python3 为例介绍 metaclass 的语法和使用场景。
 
 ## 语法定义
 
@@ -95,7 +95,7 @@ Traceback (most recent call last):
 TypeError: can't set attributes of built-in/extension type 'type'
 ```
 
-然而并不允许，这个很好理解，因为一旦修改了 `type`, 那么就会影响到所有内置的 class。因此，python3 提供了一种额外的机制，这就是 `metaclass`
+然而并不允许，因为一旦修改了 `type`, 那么就会影响到所有内置的 class。因此，Python3 提供了一种额外的机制，也就是 `metaclass`
 
 ```
 class MyMeta(type):

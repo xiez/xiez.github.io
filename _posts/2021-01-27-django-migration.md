@@ -8,7 +8,9 @@ tags:
   - django
 ---
 
-Django Migration 主要用来自动化地变更数据库的 schema（新增表，新增字段等等），有点类似版本控制系统（git），只是控制的是数据库的 schema，而不是代码。主要分为两部分：
+Django Migration 主要用来自动化地变更数据库的 schema（新增表，新增字段等等），有点类似版本控制系统（git），只是控制的是数据库的 schema，而不是代码。
+
+migration 主要分为两部分：
 
 - `makemigrations`: 基于 models 的变更，来生成新的 migration 文件，存放到各个 app 下的 `migrations` 目录。
 
@@ -22,7 +24,7 @@ Django Migration 主要用来自动化地变更数据库的 schema（新增表�
 
 ## Make Migrations
 
-`python manage.py makemigrations` 该命令通过对比现有的migration文件和所有APP的models字段，根据差异生成新的 migration 文件。
+`python manage.py makemigrations` 该命令通过对比现有的 migration 文件和所有 APP 的 models 字段，根据差异生成新的 migration 文件。
 
 代码路径： [https://github.com/django/django/blob/stable/1.11.x/django/core/management/commands/makemigrations.py](https://github.com/django/django/blob/stable/1.11.x/django/core/management/commands/makemigrations.py)
 
@@ -63,7 +65,7 @@ class MigrationLoader(object):
         ...
 ```
 
-`MigrationGraph` 本质上就是项目里所有 migration 文件的依赖关系图。图中的每一个节点`Node`代表一个app下的migration文件，例如 `('app_A, '0001_auto_20190822_0806')`
+`MigrationGraph` 本质上就是项目里所有 migration 文件的依赖关系图。图中的每一个节点 `Node` 代表一个 app 下的 migration 文件，例如 `('app_A, '0001_auto_20190822_0806')`
 
 ![migration graph](https://github.com/xiez/xiez.github.io/raw/master/assets/images/2021/01/migation_graph.png "migration graph")
 
@@ -93,7 +95,7 @@ class Node(object):
 
 代码路径： [https://github.com/django/django/blob/stable/1.11.x/django/db/migrations/state.py#L88](https://github.com/django/django/blob/stable/1.11.x/django/db/migrations/state.py#L88)
 
-有了上面的migration依赖关系图后，就可以[推导出整个项目的状态](https://github.com/django/django/blob/stable/1.11.x/django/core/management/commands/makemigrations.py#L150)，也就是上一次执行`makemigration`时的项目状态，项目状态可以理解为项目里所有APP里的model状态。
+有了上面的依赖关系图后，就可以[推导出整个项目的状态](https://github.com/django/django/blob/stable/1.11.x/django/core/management/commands/makemigrations.py#L150)，也就是上一次执行`makemigration`时的项目状态，项目状态可以理解为项目里所有APP里的model状态。
 
 
 ```
@@ -154,9 +156,9 @@ class MigrationGraph(object):
         return project_state
 ```
 
-`make_state`函数其实就做了一件事情，从空的ProjectState开始，把当前所有的migration应用一遍，这样就导出了对应的项目状态。
+`make_state`函数其实就做了一件事情，从空的 ProjectState 开始，把当前所有的 migration 应用一遍，这样就导出了对应的项目状态。
 
-上面说的项目状态就是所有APP的model，对应的类为`ProjectState`
+上面说的项目状态就是所有 APP 的 model，对应的类为`ProjectState`
 
 ```
 class ProjectState(object):
@@ -183,7 +185,7 @@ class ProjectState(object):
         return cls(app_models)
 ```
 
-ProjectState 借助了 `ModelState` 来应用migration, 之所以不用`db.Model`，是因为`db.Model.options`假定不可变。
+ProjectState 借助了 `ModelState` 来应用 migration, 之所以不用`db.Model`，是因为`db.Model.options`假定不可变。
 
 ```
 class ModelState(object):
@@ -297,9 +299,9 @@ class Migration(object):
         return new_state
 ```
 
-`Migration`有个方法`mutate_state`，该方法就是被`graph.make_state`用来应用migration，生成新的项目状态。
+`Migration`有个方法`mutate_state`，该方法就是被`graph.make_state`用来应用 migration，生成新的项目状态。
 
-每个migration对象最后再通过`MigrationWriter`写入到各自app的`migration`目录。生成的migration文件如下：
+每个 migration 对象最后再通过`MigrationWriter`写入到各自app的`migration`目录，最后生成如下文件：
 
 ```
 # -*- coding: utf-8 -*-
@@ -334,7 +336,7 @@ class Migration(migrations.Migration):
 
 ### Bonus
 
-理论上说，`makemigrate`只检查项目里的migration文件，不应该访问数据库，但实际上实例化完`MigrationLoader`后，会做一次历史一致性的检查，该检查主要防止`django_migration`表的数据不一致，比如已经被应用的`migration 0002`，它所依赖的`migration 0001`却没被应用。
+理论上说，`makemigrate`只检查项目里的 migration 文件，不应该访问数据库，但实际上实例化完`MigrationLoader`后，会做一次历史一致性的检查，该检查主要防止`django_migration`表的数据不一致，比如已经被应用的`migration 0002`，它所依赖的`migration 0001`却没被应用。
 
 ```
 # Raise an error if any migrations are applied before their dependencies.
@@ -345,6 +347,7 @@ loader.check_consistent_history(connection)
 
 这个问题在[ticket 25850](https://code.djangoproject.com/ticket/25850)里提出来，在[1.10版本里修复](https://github.com/django/django/commit/02ae5fd31a56ffb42feadb49c1f3870ba0a24869)。
 
+所以，如果项目无法连接到数据库，会导致 make 过程失败。
 
 ## Migrate
 
@@ -352,7 +355,6 @@ loader.check_consistent_history(connection)
 
 1. 计算出哪些`migration`需要应用。
 2. 遍历这些`migration`的`operations`列表，然后交给 `SchemaEditor` 来执行更新数据库的操作。
-
 
 
 ### MigrationExecutor
@@ -382,9 +384,9 @@ class MigrationExecutor(object):
         self.progress_callback = progress_callback
 ```
 
-`MigrationLoader` 在上面已经了解过，主要用来加载磁盘上的migration文件，并生成migration文件的依赖关系图。
+`MigrationLoader` 在上面已经了解过，主要用来加载磁盘上的 migration 文件，并生成 migration 文件的依赖关系图。
 
-`MigrationRecorder` 主要为了把migration的执行记录在数据库里记下来，方便实现增量式的变更。
+`MigrationRecorder` 主要为了把 migration 的执行记录在数据库里记下来，方便实现增量式的变更。
 
 ### MigrationRecorder
 
@@ -422,7 +424,7 @@ class MigrationRecorder(object):
         self.connection = connection
 ```
 
-Django里所有的数据表都可以通过migratation创建，唯独migration自己所需要用到的表需要使用`SchemaEditor`手工创建。
+Django里所有的数据表都可以通过 migratation 创建，唯独 migration 自己所需要用到的表需要使用`SchemaEditor`手工创建。
 
 
 ```
@@ -450,7 +452,7 @@ class MigrationRecorder(object):
 
 ### Migration Plan
 
-`MigrationExecutor` 实例化完成后，接下来需要生成`migration plan`, 也就是需要执行哪些migration
+`MigrationExecutor` 实例化完成后，接下来需要生成`migration plan`, 也就是需要执行的 migration, `migration_plan` 主要就从 `loader` 的 migration 依赖图里，找到未应用的 migration。
 
 ```
 targets = executor.loader.graph.leaf_nodes()
@@ -474,12 +476,9 @@ class MigrationExecutor(object):
 
 ```
 
-`migration_plan` 主要就从 `loader` 的migration依赖图里，找到未应用的migration
-
-
 ### Pre-migrate/Post-migrate Signal
 
-在migrate执行前后，各个app可以接收信号`pre_migrate/post_migrate`来做一些自定义的事情。
+在 migrate 执行前后，各个 app 可以接收信号`pre_migrate/post_migrate`来做一些自定义的事情。
 
 ```
 def emit_pre_migrate_signal(verbosity, interactive, db, **kwargs):
@@ -510,9 +509,9 @@ def emit_post_migrate_signal(verbosity, interactive, db, **kwargs):
 
 ### Migrate
 
-`migrate` 分正向和反向(`forward/backward`)， 反向migrate主要用在回退一个migration, 例如：当前已经应用了0001, 0002, 0003 这3个migration， 重新应用0001, 就会回退后面两个migration。
+`migrate` 分正向和反向(`forward/backward`)， 反向migrate主要用在回退一个 migration, 例如：当前已经应用了0001, 0002, 0003， 重新应用0001, 就会回退后面两个 migration。
 
-有了需要应用的plan列表后，`migrate`就可以遍历这个列表，开始应用migration，也就是调用`migration.apply`
+有了需要应用的 plan 列表后，`migrate`就可以遍历这个列表，开始应用migration，也就是调用`migration.apply`
 
 
 ```
@@ -560,7 +559,7 @@ class MigrationExecutor(object):
         return state
 ```
 
-`apply`函数就是遍历migraiton里的 `operations` 列表，再交给 `SchemaEditor` 来执行具体的数据库变更。
+`apply`函数就是遍历 migraiton 里的 `operations` 列表，再交给 `SchemaEditor` 来执行具体的数据库变更。
 
 ```
     def apply(self, project_state, schema_editor, collect_sql=False):

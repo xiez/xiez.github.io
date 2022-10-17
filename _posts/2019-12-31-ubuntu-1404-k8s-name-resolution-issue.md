@@ -14,7 +14,7 @@ tags:
 
 ## 问题症状
 
-Python Web 应用启动后，日志里有大量数据库域名无法解析的错误:
+Django 应用启动后，日志里有大量数据库域名无法解析的错误:
 
 ```
 django.db.utils.OperationalError: could not translate host name "postgres.namespace.svc.cluster.local" to address: No address associated with hostname
@@ -23,8 +23,10 @@ django.db.utils.OperationalError: could not translate host name "postgres.namesp
 应用使用集群[DNS 服务](https://kubernetes.io/docs/concepts/services-networking/service/#dns) 访问数据库（postgres），服务的部署类型是 ClusterIP。
 
 集群的部署情况大致如下：
-一台 master 节点，3台工作节点，操作系统：ubuntu 18.04
-kubernetes 版本：v1.15， 使用 rancher 管理，只用作开发测试，集群负载很低。
+
+- 一台 master 节点，3台工作节点，操作系统：ubuntu 18.04
+
+- Kubernetes 版本：v1.15， 使用 Rancher 管理，只用作开发测试，集群负载很低。
 
 
 ## 问题初查
@@ -42,9 +44,9 @@ Name:   postgres.namespace.svc.cluster.local
 Address: 10.43.241.110
 ```
 
-这样看来，DNS 服务应该没问题。重新再看了下日志，发现除了数据库，rabbitMQ 服务的域名也无法解析，从错误日志看，是在调用 [socket.getaddrinfo](https://github.com/pika/pika/blob/b907f91415169b7f590174ab5d228e75a1b273e6/pika/adapters/base_connection.py#L124) 出错。
+这样看来，DNS 服务应该没问题。
 
-OK～看来应该是客户端的问题。接下来写个小脚本测试下连接。
+重新细看了下日志，发现除了数据库，RabbitMQ 服务的域名也无法解析，从错误日志看，是在调用 [socket.getaddrinfo](https://github.com/pika/pika/blob/b907f91415169b7f590174ab5d228e75a1b273e6/pika/adapters/base_connection.py#L124) 出错。接下来写了个小脚本测试下DNS 连接。
 
 ## 测试脚本
 
@@ -56,7 +58,7 @@ addr = socket.getaddrinfo(db, 5432, 0, socket.SOCK_STREAM, socket.IPPROTO_TCP)
 print(addr)
 ```
 
-连续测试几次后，有意思的问题出现了。域名并不是一直无法解析，而是间断性可以解析，中间间隔30秒。
+连续测试几次后，有意思的问题出现了。域名并不是一直无法解析，而是间断性可以解析成功，两次成功中间有30秒无法解析。
 
 ```bash
 root@ubuntu1404-648966b7fd-wx87s:/# python3 sock.py 
@@ -73,7 +75,7 @@ root@ubuntu1404-648966b7fd-wx87s:/# python3 sock.py
 root@ubuntu1404-648966b7fd-wx87s:/# 
 ```
 
-30秒内只能解析成功一次？这什么鬼？！像是某种缓存之类的，30秒过期。因为应用跑在容器里，没有额外的服务可以缓存 DNS，应用这边也没有缓存。好吧。。似乎可以排除客户端的问题了。
+30秒内只能解析成功一次？像是某种缓存之类的，30秒过期。因为应用跑在容器里，没有额外的服务可以缓存 DNS，应用这边也没有缓存，似乎也可以排除客户端的问题。
 
 从个人经验来说，缓存不大可能会影响程序的正确性，还是看看 CoreDNS 的配置和日志吧。
 
@@ -97,7 +99,7 @@ root@ubuntu1404-648966b7fd-wx87s:/#
 }
 ```
 
-配置里有 `cache 30`,查了下[coredns cache 文档](https://coredns.io/plugins/cache/)
+配置里有 `cache 30`，查了下[coredns cache 文档](https://coredns.io/plugins/cache/)
 
 > With cache enabled, all records except zone transfers and metadata records will be cached for up to 3600s. Caching is mostly useful in a scenario when fetching data from the backend (upstream, database, etc.) is expensive.
 
@@ -140,22 +142,22 @@ options ndots:5
 2019-12-31T06:19:28.197Z [INFO] 10.42.2.16:59892 - 20345 "AAAA IN postgres.namespace.svc.cluster.local. udp 58 false 512" NOERROR qr,rd 151 0.000172475s
 ```
 
-前两行是执行第一次成功的日志输出，后面几行是下一次失败的日志结果。
+前两行是执行第一次成功的日志输出，后面几行是后一次失败的日志结果。
 从日志里看，服务端返回的结果都是 `NOERROR`，也就是说 coredns 都成功返回了。但是客户端似乎不认可从 cache 返回的结果，又重试了3次才放弃。
-另外，从 cache 返回的响应头部只有 `qr,rd`, 没有设置 `aa` 返回位。难道是这个原因？
+另外，从 cache 返回的响应头部只有 `qr,rd`, 没有设置 `aa` 返回位。
 
 查了下[rfc文档](https://tools.ietf.org/html/rfc1035)和一些[博客资料](https://danielmiessler.com/study/dns/#authoritative)：
 
 > Authoritative vs. Non-authoritative Responses
 > Authoritative responses are responses that come directly from a nameserver that has authority over the record in question. Non-authoritative answers come second-hand (or more), i.e., from another server or through a cache.
 
-从 cache 里返回的结果确实不应该设置`aa`位。
-或许我应该看看 python `socket.getaddrinfo` 的源码?
-
+从 cache 里返回的结果确实不应该设置`aa`位，所以，DNS 服务端的实现也符合规范，只能再查下是不是客户端的问题。
 
 ## getaddrinfo
 
-看了下 python socket 模块的[代码](https://github.com/python/cpython/blob/3.6/Modules/socketmodule.c#L6061)，它实际调用的是系统函数 [getaddrinfo](http://man7.org/linux/man-pages/man3/getaddrinfo.3.html)。所以，不是 python 应用的问题，而是 getaddrinfo 这个系统函数的问题。
+Python Postgres/RabbitMQ 的客户端代码最终都会调用标准库的 `socket.getaddrinfo`。
+
+看了下 python socket 模块的[代码](https://github.com/python/cpython/blob/3.6/Modules/socketmodule.c#L6061)，它实际调用的是系统函数 [getaddrinfo](http://man7.org/linux/man-pages/man3/getaddrinfo.3.html)。所以，如果确实是客户端的问题，那所有使用 getaddrinfo 这个系统函数的应用都会有问题。
 
 于是写了一段小程序，测试下 `getaddrinfo`:
 
@@ -231,14 +233,16 @@ err code: -5
 err: No address associated with hostname
 ```
 
-OK 应该是 glibc 版本太老了，应用镜像当前是基于 ubuntu 14.04， glibc 版本 2.19。于是把基础镜像改成 ubuntu 18.04 后，这个问题就解决了。
+OK 问题重现了。
+
+由于当前的应用镜像当前是基于 ubuntu 14.04，大概率是系统库的 glibc 版本太老了（当前版本 2.19），于是把基础镜像改成 ubuntu 18.04 后，这个问题就消失了。
 
 
 ## 额外收获
 
-1. 在测试 coredns 时候，发现最新版（1.7.3）并没有这个问题。后来多次降级后，发现在 [1.5.1](https://coredns.io/2019/06/26/coredns-1.5.1-release/) 里修改了代码，cache 返回的响应里也设置 `aa` 位，原因可以参考[这个PR](https://github.com/coredns/coredns/pull/2885)。 当然，目前这种方式只是一种 hack，为了兼容老的系统，后续可能会再调整。我也顺带帮作者完善了下[代码注释](https://github.com/coredns/coredns/pull/3573)。
+1. 在测试时候，发现 CoreDNS 最新版（1.7.3）并没有解析失败的问题。后来多次降级后，发现在 [1.5.1](https://coredns.io/2019/06/26/coredns-1.5.1-release/) 里修改了代码，cache 返回的响应里也设置 `aa` 位，主要为了兼容老的DNS客户端，具体原因可以参考[这个PR](https://github.com/coredns/coredns/pull/2885)。 我也顺带帮作者完善了下[代码注释](https://github.com/coredns/coredns/pull/3573)。
 
-2. [这篇文章](https://pracucci.com/kubernetes-dns-resolution-ndots-options-and-why-it-may-affect-application-performances.html)介绍了 `ndots:5` 对性能的影响。总的来说，如果 `/etc/resolv.conf`配置了 `ndots:5`, 那么使用 service name `postgres` 或者 fully qualified name `postgres.namespace.svc.cluster.local.`（注意最后的点）。否则系统会进行多次无效的 dns 查询，影响应用的性能。
+2. [这篇文章](https://pracucci.com/kubernetes-dns-resolution-ndots-options-and-why-it-may-affect-application-performances.html)介绍了 `ndots:5` 对性能的影响。总的来说，如果 `/etc/resolv.conf`配置了 `ndots:5`, service name 需要设置为 `postgres` 或者 `postgres.namespace.svc.cluster.local.`（注意最后的点），否则系统会进行多次无效的 dns 查询，影响应用的性能。
 
 
 ## 阅读材料
