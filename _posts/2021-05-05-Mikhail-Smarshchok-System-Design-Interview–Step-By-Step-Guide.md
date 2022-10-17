@@ -6,7 +6,7 @@ categories:
 tags:
   - videos
   - system-design
-type: note
+type: en
 ---
 
 Most valuable video channel for system design interview questions, [Mikhail Smarshchok](https://www.linkedin.com/in/mikhail-smarshchok-507770122/) explains things very well and thorough.

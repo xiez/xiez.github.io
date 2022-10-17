@@ -9,6 +9,7 @@ tags:
   - helm
   - fluxcd
   - kubernetes
+type: en
 ---
 
 This video is about the practice of [GitOps](https://www.weave.works/technologies/gitops/) in CERN. The tools used include FluxCD, Helm and GitlabCI, which are of great reference value.
