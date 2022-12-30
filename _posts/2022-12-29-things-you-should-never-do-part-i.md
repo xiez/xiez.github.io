@@ -3,6 +3,7 @@ title: 你永远不应该做的事，第一部分
 classes: wide
 categories:
   - 2022-12
+words_per_minute: 15
 tags:
   - refactoring
   - reading
