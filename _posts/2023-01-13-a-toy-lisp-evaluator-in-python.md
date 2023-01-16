@@ -10,31 +10,37 @@ tags:
 
 SICP 第四章里详细讲解了自循环解释器（meta-circular evaluator），也就是使用 Lisp 语言实现一个解释器来运行 Lisp 程序。该解释器只有几百行 Scheme 代码，却展示了一些重要的概念，例如 eval-apply 循环，动态绑定，延迟求值等。为了加深理解，这里使用 Python3 来实现这个解释器的一部分，目标是能够运行书上第二章习题 2.42 的“八皇后”代码。
 
-在本文里，我们不使用任何的面向对象的技术，只使用list，tupple这类基础的数据结构，这样更贴近书本上的实现。
+在本文里，我们不使用任何的面向对象的技术，只使用list这种基础的数据结构，这样更贴近书本上的实现。
 
 ## 解析器（parser）
 
 解析器作为解释器的「前端」，主要负责把用户输入的代码转换成内部的数据结构，也就是所谓的抽象语法树（AST）。我们沿用[上篇文章](https://blog.justinzx.com/lisp-expression-parsing/)里的 parser，最后出来的 AST 如下：
 
 ```
-['defun', 'factorial', ['x'], ['if', ['zerop', 'x'], 1, ['*', 'x', ['factorial', ['-', 'x', 1]]]]]
+>>> parse('''(define (fib n)
+  (if (< n 2)
+      1
+      (+ (fib (- n 2))
+         (fib (- n 1)))))''')
+
+['define', ['fib', 'n'], ['if', ['<', 'n', 2], 1, ['+', ['fib', ['-', 'n', 2]], ['fib', ['-', 'n', 1]]]]]
 ```
 
 这里我们使用列表嵌套列表的方式来表示树型的数据结构。这种数据结构也成为表达式（expression）。有两类表达式：
 
-- 基础表达式（primitive expression）
+- 基础表达式（primitive expression）例如： `42`，`3.14`之类的数值表达式，`+`,`*`之类的基础过程表达式。
 
-基础表达式例如： `42`， `+`
+- 复合表达式（compound expression）例如：`['+', 1, 2]` 把数值表达式和基础过程表达式结合起来，代表该过程对这些数值的应用。
 
-- 复合表达式（compound expression）
+所有复合表达式在 Python 里的数据结构都是列表，而基础表达式在 Python 里表示为数值和字符串。
 
-
+复合表达式也称为组合（combination），最左边的元素称为操作符（operator）, 剩下的元素称为操作数（operands）。
 
 ## 解释-应用循环（eval-apply cycle）
 
 解释器的核心是两个函数 `eval` 和 `apply`,
 
-`eval` 负责分析表达式的语义，根据不同类型选择不同的执行路径。
+`eval` 负责分析表达式的语义，如果是基础表达式，则转换为 Python 对应的类型。如果是复合表达式，则根据表达式的操作符来选择不同的处理方式。
 
 ```
 def eval_(exp, env):
@@ -65,23 +71,189 @@ def eval_(exp, env):
 
 表达式的类型如下：
 
-- `42`,`3.14`或者`"hello"`之类的基础类型，则转为 Python 里的数值或字符串。
+- 基础类型：`42`,`3.14`或者`"hello"`之类的由双引号包裹的字符串
 
-- `foo`之类的变量，则转为这个变量对应的值。
+- 变量：`foo` `bar` 之类的符号
 
-- `['if', ...]`，则根据条件执行相应的分支。
+- 条件语句：`['if', ...]`
 
-- `['cond', ...]`，则转换成嵌套的if，并根据测试条件执行相应的分支。
+- 多个条件语句：`['cond', ...]`
 
-- `['lambda', ...]`，则构造对应的函数。
+- lambda 函数： `['lambda', ...]`
 
-- `['define', ...]`，则执行变量赋值。
+- 变量或函数定义：`['define', ...]`
 
-- `['foo', ...]` 之类的其他列表，则当作函数调用 `apply`。
+- 除上述之外的其他复合表达式：`['foo', ...]`
+
+### number and string
+
+能够被转换成 Python 的`int`和`float`以及`str`的基础表达式，我们称为能够被 `self_evaluating`。例如：`123`, `3.14`, `"hello"`
+
+**注意：** 这里我们仅支持双引号包裹的字符串。
+
+例如：
+
+```
+** >> 1
+1
+** >> 3.14
+3.14
+** >> "hello"
+hello
+```
+
+### variable
+
+无法被 `self_evaluating` 的基础表达式，统称为变量，例如：`+`, `hello`等。当解释器遇到变量时，需要从环境（Environment）里查找变量对应的值，如果没有则报错。
+
+例如：
+
+```
+** >> +
+<built-in function add>
+** >> square
+Error: square is not defined in the ENV.
+```
+
+### if
+
+if 表达式的语法为：`(if <predicate> <consequent> <alternative>)`，例如：
+
+```
+** >> (if (= 1 1) true false)
+True
+** >> (if (= 1 2) true false)
+False
+```
+
+对应的表达式如下：
+
+```
+['if', predicate-expr, consequent-expr, alternative-expr]
+```
+
+`predicate-expr` 可以为`true`, `false`之类的基础表达式，也可以为`['=', 1, 2]`之类的复合表达式。如果 `predicate-expr` 为 True，则执行`consequent-expr`，否则执行 `alternative-expr`。
 
 
+### cond
 
-`apply` 负责把参数应用到函数里，这里的函数可能是基础函数（`+`, `abs`等），也可能是自定义函数（`fib`, `queens`等）。
+cond 表达式的语法为：
+
+```
+(cond (predicate-1 expression-1)
+      (predicate-2 expression-2)
+      ...
+      (else expression-n))
+```
+
+例如：
+
+```
+** >> (cond ((= 1 1) "1==1") ((= 2 2) "2==2") (else "else.."))
+1==1
+** >> (cond ((= 1 2) "1==1") ((= 2 2) "2==2") (else "else.."))
+2==2
+** >> (cond ((= 1 2) "1==1") ((= 2 3) "2==2") (else "else.."))
+else..
+```
+
+对应的表达式如下：
+
+```
+['cond', [predicate-1, expr-1], [predicate-2, expr-2], ..., ['else', expr-n]]
+```
+
+我们把 cond 表达式转换成嵌套的 if 表达式：
+
+```
+['if', predicate-1, expr-1,
+    ['if', predicate-2, expr-2,
+        expr-n
+        ]]
+```
+
+这样做一层转换，可以不引入额外的处理逻辑，让解释器的代码更简洁和统一。
+
+### lambda
+
+lambda 表达式的语法为：
+
+```
+(lambda (arguments) body)
+```
+
+例如：
+
+```
+** >> (lambda (x) (+ 1 x))
+['procedure', ['x'], [['+', 1, 'x']], [{'+': <built-in function add>, '-': <built-in function sub>, '*': <built-in function mul>, '/': <built-in function truediv>, '=': <built-in function eq>, '<': <built-in function lt>, '>': <built-in function gt>, 'display': <built-in function print>, 'cons': <function <lambda> at 0x10ab925e0>, 'car': <function <lambda> at 0x10ab92820>, 'cdr': <function <lambda> at 0x10ab92790>, 'null': (), 'null?': <function <lambda> at 0x10ab92a60>, 'true': True, 'false': False, 'list': <function list_impl at 0x10ab92700>, 'abs': <built-in function abs>}]]
+```
+
+对应的表达式如下：
+
+```
+['lambda', [formal-arguments], body]
+```
+
+lambda 一词等同于 `make-procedure`，也就是构建一个函数，最后返回的是一个函数对象，包含了形式参数（formal-arguments）、函数体以及对参数和函数体求值所需要的环境（ENV）。
+
+### define
+
+define 表达式既可以定义变量，也可以定义函数，语法为：
+
+```
+(define variable value)
+
+(define (name arguments) body)
+```
+
+例如：
+
+```
+** >> (define a 42)
+None
+** >> (define (foo x) (+ x 1))
+None
+```
+
+对应的表达式如下：
+
+```
+['define', variable, value]
+
+['define', [name, arguments], body]
+```
+
+如果是变量定义，则把 `vairable -> value` 关系写入到环境里。
+
+如果是函数定义，则先转换成 lambda 表达式，并对其求值后生成一个函数对象，再把 `name -> procedure` 关系写入到环境里。
+
+### combination
+
+除上述特定语义的表达式外，其他复合表达式统一归为函数，需要递归对操作符和操作数求值后，把函数对象（procedure）以及参数值（actual-arguments）传给 `apply` 函数，`apply`负责具体的函数应用。例如：
+
+`(+ a 1)` 对应的表达式 `['+', 'a', 1]` 的求值步骤如下：
+
+1. `eval('+', ENV)` -> <built-in function add>
+
+2. `eval('a', ENV)` -> 42
+
+3. `eval(1, ENV)` -> 1
+
+4. 把函数对象`<built-in function add>`以及对应的实际参数列表`(42,1)`传给 `apply`做具体的函数应用。
+
+
+`(foo 1)` 对应的表达式`['foo', 1]`的求值步骤如下：
+
+1. `eval('foo', ENV)` -> 函数对象 `['procedure', [], [['+', 3, 1]], ENV]`
+
+2. `eval(1, ENV)` -> 1
+
+3. 把函数对象`['procedure', [], [['+', 3, 1]], ENV]`以及对应的实际参数列表`(1)`传给 `apply`做具体的函数应用。
+
+---
+
+`apply` 负责具体的函数应用，如果是 Python 内置函数，则调用 Python 的 `apply` 函数。如果是自定义的函数对象，则在**新的环境**里依次对函数体求值。新的环境扩展了当前的环境，并包含了形参到实际参数的映射`formal-arguments->actual-arguments`。
 
 ```
 def apply_(proc, args):
@@ -98,23 +270,13 @@ def apply_(proc, args):
         raise Exception(f"Unknown procedure type -- APPLY {proc}")
 ```
 
-这两个函数互相调用，形成了互相递归。
+`eval` 和 `apply` 这两个函数互相调用，形成了互递归（mutual recursion）。如下图：
 
-### number and string
+![eval-apply cycle](https://sarabander.github.io/sicp/html/fig/chap4/Fig4.1a.std.svg)
 
-### variable
-
-### if
-
-### cond
-
-### lambda
-
-### define
-
-### function
 
 ### 环境（Environment）
+
 
 
 ## 读取-解释-输出循环（REPL）
