@@ -8,7 +8,7 @@ tags:
   - lisp
 ---
 
-SICP 第四章里详细讲解了自循环解释器（meta-circular evaluator），也就是使用 Lisp 语言实现一个解释器来运行 Lisp 程序。该解释器只有几百行 Scheme 代码，却展示了一些重要的概念，例如 eval-apply 循环，动态绑定，延迟求值等。为了加深理解，这里使用 Python3 来实现这个解释器的一部分，目标是能够运行书上第二章习题 2.42 的“八皇后”代码。
+SICP 第四章里详细讲解了自循环解释器（meta-circular evaluator），也就是使用 Lisp 语言实现一个解释器来运行 Lisp 程序。该解释器只有几百行 Scheme 代码，却展示了一些重要的概念，例如 eval-apply 循环，静态绑定（static binding），延迟求值等。为了加深理解，这里使用 Python3 来实现这个解释器的一部分，目标是能够运行书上第二章习题 2.42 的“八皇后”代码。
 
 在本文里，我们不使用任何的面向对象的技术，只使用list这种基础的数据结构，这样更贴近书本上的实现。
 
@@ -26,9 +26,9 @@ SICP 第四章里详细讲解了自循环解释器（meta-circular evaluator）�
 ['define', ['fib', 'n'], ['if', ['<', 'n', 2], 1, ['+', ['fib', ['-', 'n', 2]], ['fib', ['-', 'n', 1]]]]]
 ```
 
-这里我们使用列表嵌套列表的方式来表示树型的数据结构。这种数据结构也成为表达式（expression）。有两类表达式：
+这里我们使用列表嵌套列表的方式来表示树型的数据结构。这种数据结构也成为表达式（expression），表达式分两种：
 
-- 基础表达式（primitive expression）例如： `42`，`3.14`之类的数值表达式，`+`,`*`之类的基础过程表达式。
+- 基础表达式（primitive expression）例如： `42`，`3.14`之类的数值，`"hello"`之类的字符串以及`+`,`*`之类的符号。
 
 - 复合表达式（compound expression）例如：`['+', 1, 2]` 把数值表达式和基础过程表达式结合起来，代表该过程对这些数值的应用。
 
@@ -40,7 +40,7 @@ SICP 第四章里详细讲解了自循环解释器（meta-circular evaluator）�
 
 解释器的核心是两个函数 `eval` 和 `apply`,
 
-`eval` 负责分析表达式的语义，如果是基础表达式，则转换为 Python 对应的类型。如果是复合表达式，则根据表达式的操作符来选择不同的处理方式。
+`eval` 负责分析表达式的语义，如果是基础表达式中的数值和字符串，则转换为 Python 对应的类型；如果是符号，则查找符号对应的值。如果是复合表达式，则根据表达式的操作符来选择不同的处理方式。
 
 ```
 def eval_(exp, env):
@@ -71,9 +71,9 @@ def eval_(exp, env):
 
 表达式的类型如下：
 
-- 基础类型：`42`,`3.14`或者`"hello"`之类的由双引号包裹的字符串
+- 数值和字符串：`42`,`3.14`或者`"hello"`之类的由双引号包裹的字符串
 
-- 变量：`foo` `bar` 之类的符号
+- 符号：`foo` `bar` 之类的符号
 
 - 条件语句：`['if', ...]`
 
@@ -172,7 +172,7 @@ else..
         ]]
 ```
 
-这样做一层转换，可以不引入额外的处理逻辑，让解释器的代码更简洁和统一。
+这样做一层转换，可以不引入额外的分支处理逻辑，让解释器的代码更简洁和统一。
 
 ### lambda
 
@@ -234,7 +234,7 @@ None
 
 `(+ a 1)` 对应的表达式 `['+', 'a', 1]` 的求值步骤如下：
 
-1. `eval('+', ENV)` -> <built-in function add>
+1. `eval('+', ENV)` -> `<built-in function add>`
 
 2. `eval('a', ENV)` -> 42
 
@@ -258,7 +258,7 @@ None
 ```
 def apply_(proc, args):
     if is_primitive_proc(proc):
-        return run_python_apply(proc, args)
+        return apply_in_python(proc, args)
     elif is_compound_procedure(proc):
         return eval_sequence(
             procedure_body(proc),
@@ -275,8 +275,21 @@ def apply_(proc, args):
 ![eval-apply cycle](https://sarabander.github.io/sicp/html/fig/chap4/Fig4.1a.std.svg)
 
 
+
 ### 环境（Environment）
 
+https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2
+
+函数对象在 `eval lambda-expr` 时创建，每个函数对象都有当时创建时的环境。
+
+每次执行 apply 会新创建一个环境。
+
+
+#### 静态绑定 vs 动态绑定
+
+#### 内嵌函数
+
+#### 高阶函数
 
 
 ## 读取-解释-输出循环（REPL）
