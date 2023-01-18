@@ -276,20 +276,175 @@ def apply_(proc, args):
 
 
 
-### 环境（Environment）
+### 环境模型（Environment Model）
 
-https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2
+表达式本身没有意义，一个表达式只有在某个环境中才有意义。例如：`['+', 1, 1]`，只有在环境中找个'+'对应的函数，整个表达式才有意义。因此，`eval` 函数都需要带上 env 环境参数。
 
-函数对象在 `eval lambda-expr` 时创建，每个函数对象都有当时创建时的环境。
+SICP 3.2章:
 
-每次执行 apply 会新创建一个环境。
+> Indeed, one could say that expressions in a programming language do not, in themselves, have any meaning. Rather, an expression acquires a meaning only with respect to some environment in which it is evaluated.
+
+环境是多个 frame 的序列，frame 类似哈希表，包含某个符号对应的值。每次执行 `apply <proc-obj>` 会新创建一个新的 frame，插入到序列的开头，从而成为一个新的环境。
+
+在一个环境里，获取一个变量的值需要遍历多个frame，直到找到第一个包含该变量的frame；如果遍历完成没有找到，则表示该变量未绑定。
+
+`(define var val)` 会往当前环境的第一个 frame 写入映射关系 `var -> val`。
+
+### 递归函数
+
+```scheme
+** >> (define (fact n)
+  (if (< n 2)
+      1
+      (* n (fact (- n 1)))))
+
+** >> (fact 5)
+120
+```
+
+`define fact (λ (n) ...)` 经过`eval`后，在全局的环境变量E0里绑定了 `fact -> <fact-proc>`，其中，`fact-proc`包含一个指向E0的指针。
+
+`(fact 5)` 经过`eval`后，把 `<fact-proc` 以及参数`(5)`传入到`apply`，
+
+- 创建新的环境E1包含了`{n->5}`以及父环境的指针E0，
+
+- fact 函数体 `['if', ...]`在E1里`eval`，
+
+
+#### 内嵌函数
+
+```scheme
+** >> (define (foo a)
+  (define (bar x)
+    (+ x a))
+  (bar 42))
+
+** >> (foo 1)
+43
+
+```
+
+#### 高阶函数
+
+```scheme
+** >> (define (f x)
+  (define (g)
+    x)
+  g)
+
+** >> (f 10)
+['procedure', [], ['x'], [{'x': 10, 'g': [...]}, {...}]]
+
+** >> ((f 10))
+10
+```
+
+`((f 10))` 在环境 E0 的 eval/apply 步骤如下：
+
+1. `((f 10))` 是复合表达式（combination），先 eval 操作符`(f 10)`，再 eval 操作数`()`，最后 apply 两者的结果
+ 
+    1. `(f 10)` 也是复合表达式, 先 eval 操作符`f` ，得到函数对象 `<f>`, 再 eval 操作数 `10`，结果为10
+ 
+    2. apply `<f>` 和 `10`
+ 
+        1. 新增 frame `{x->10}`，作为新的环境 E1
+ 
+        2. 在环境 E1 里 eval `<f>` 的内容（ `(define (g) x)` 在 E1 里绑定了`g -> <g>`，`g`在 E1 里查找 g 对应的函数对象`<g>`并返回）
+ 
+2. 操作数`()`的 eval 结果为空列表
+ 
+3. apply 上面的结果
+ 
+    1. 新增空 frame，作为新的环境 E2
+ 
+    2. eval `<g>` 的内容（`x` 在 E1 里绑定，结果为 10）
 
 
 #### 静态绑定 vs 动态绑定
 
-#### 内嵌函数
+静态绑定也叫词汇绑定（lexical binding），
 
-#### 高阶函数
+```scheme
+> (let* ((a 1) (f (lambda (x) (+ x a))))
+    (let ((a 2))
+      (f 1)))
+2
+```
+
+```scheme
+> (let* ((a (make-parameter 1)) (f (lambda (x) (+ x (a)))))
+    (let ((c 1))
+      (parameterize ((a 42))
+        (f 1))))
+43
+```
+
+
+#### 优点 vs 缺点
+
+环境模型有两个特点：
+
+1. 每次 apply 函数对象都会插入新的 frame 作为新的 eval 环境，不同环境间数据隔离。
+
+2. 局部函数可以通过父环境指针找到包裹它的所有变量绑定。
+
+这两个特点可以让我们实现类似面向对象里的 class 的概念。
+
+Racket 例子如下：
+
+```racket
+(define (make-account balance)
+  (define (withdraw amount)
+    (set! balance
+          (- balance amount))
+    balance)
+  (define (deposit amount)
+    (set! balance
+          (+ balance amount))
+    balance)
+  (define (dispatch op)
+    (cond ((equal? op 'balance) balance)
+           ((equal? op 'withdraw) withdraw)
+           ((equal? op 'deposit) deposit)
+           (else (error "Unknown op -- " op))))
+  dispatch)
+
+(define A (make-account 100))
+(define B (make-account 100))
+(A 'balance)                            ;100
+(B 'balance)                            ;100
+((A 'withdraw) 10)                      ;90
+((B 'withdraw) 20)                      ;80
+((A 'deposit) 20)                       ;110
+((B 'deposit) 10)                       ;90
+```
+
+
+对应的 Python 代码：
+
+```python
+def make_account(balance):
+    def deposit(amount):
+        nonlocal balance
+        balance += amount
+        return balance
+    def withdraw(amount):
+        nonlocal balance
+        balance -= amount
+        return balance
+    def dispatch(op, val=0):
+        if op == 'balance':
+            return balance
+        elif op == 'deposit':
+            return deposit
+        elif op == 'withdraw':
+            return withdraw
+        else:
+            assert False, f'Invalid op: {op}'
+    return dispatch
+```
+
+每次遍历所有的 frame 有性能上不够高效，所以真实的解释器一般会借助于 lexical addressing 的策略，通过在 frame 上标注额外信息来快速定位到某一个 frame 。具体可参照 SICP 5.5.6。
 
 
 ## 读取-解释-输出循环（REPL）
