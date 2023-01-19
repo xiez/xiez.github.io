@@ -26,11 +26,11 @@ SICP 第四章里详细讲解了自循环解释器（meta-circular evaluator）�
 ['define', ['fib', 'n'], ['if', ['<', 'n', 2], 1, ['+', ['fib', ['-', 'n', 2]], ['fib', ['-', 'n', 1]]]]]
 ```
 
-这里我们使用列表嵌套列表的方式来表示树型的数据结构。这种数据结构也成为表达式（expression），表达式分两种：
+这里我们使用列表嵌套列表的方式来表示树型的数据结构。这种数据结构也称为「表达式」（expression），表达式分两种：
 
-- 基础表达式（primitive expression）例如： `42`，`3.14`之类的数值，`"hello"`之类的字符串以及`+`,`*`之类的符号。
+- 基础表达式（primitive expression），例如： `42`，`3.14`之类的数值，`"hello"`之类的字符串以及`+`,`*`之类的符号。
 
-- 复合表达式（compound expression）例如：`['+', 1, 2]` 把数值表达式和基础过程表达式结合起来，代表该过程对这些数值的应用。
+- 复合表达式（compound expression），例如：`['+', 1, 2]` 组合了多个基础表达式。
 
 所有复合表达式在 Python 里的数据结构都是列表，而基础表达式在 Python 里表示为数值和字符串。
 
@@ -288,9 +288,12 @@ SICP 3.2章:
 
 在一个环境里，获取一个变量的值需要遍历多个frame，直到找到第一个包含该变量的frame；如果遍历完成没有找到，则表示该变量未绑定。
 
-`(define var val)` 会往当前环境的第一个 frame 写入映射关系 `var -> val`。
+我们通过3个具体的例子来看环境模型如何作用在 eval/apply 循环里。
+
 
 ### 递归函数
+
+阶乘函数是最简单的一类递归函数。
 
 ```scheme
 ** >> (define (fact n)
@@ -302,16 +305,46 @@ SICP 3.2章:
 120
 ```
 
-`define fact (λ (n) ...)` 经过`eval`后，在全局的环境变量E0里绑定了 `fact -> <fact-proc>`，其中，`fact-proc`包含一个指向E0的指针。
+`define fact (λ (n) ...)` 经过`eval`后，在全局的环境变量E0里绑定了 `fact -> <fact-proc>`，其中，`fact-proc`包含一个指向环境 E0 的指针。
 
-`(fact 5)` 经过`eval`后，把 `<fact-proc` 以及参数`(5)`传入到`apply`，
+`(fact 5)` 在环境 E0 的 eval/apply 步骤如下：
 
-- 创建新的环境E1包含了`{n->5}`以及父环境的指针E0，
+1. `(fact 5)` 是复合表达式（combination），先 eval 操作符`fact`，再 eval 操作数`(5)`，最后 apply 两者的结果
 
-- fact 函数体 `['if', ...]`在E1里`eval`，
+    1. `fact` 的 eval 结果为 `<fact-proc>`
+
+2. 操作数`(5)`的 eval 结果为`(5)`
+
+3. apply 上面的结果
+
+    1. 新增 frame `{n->5}`，作为新的环境 E1: `{n->5} -> E0`
+
+    2. eval `<fact-proc>` 的内容 `['if', ...]`，当前 n 为5，eval `(* n (fact (- n 1)))`这个复合表达式，
+
+        1. eval `(fact 4)` in E1
+
+        2. apply ...,  新环境 E2: `{n->4} -> E1`
+
+            1. eval `(fact 3)` in E2
+
+            2. apply ..., 新环境 E3: `{n->3} -> E2`
+
+                1. eval `(fact 2)` in E3
+
+                2. apply ..., 新环境 E4: `{n->2} -> E3`
+
+                    1. eval `(fact 1)`，in E4
+
+                    2. apply ..., 新环境 E5: `{n->1} -> E4`
+
+最后，Python 帮我们把调用栈上的 n 相乘得到 120。
+
 
 
 #### 内嵌函数
+
+内嵌函数是指在函数里再定义多个局部函数，这些局部函数可以使用外部函数的变量值，也就是所谓的「闭包」（closure）。
+
 
 ```scheme
 ** >> (define (foo a)
@@ -324,7 +357,32 @@ SICP 3.2章:
 
 ```
 
+`(foo 1)` 在环境 E0 的 eval/apply 步骤如下：
+
+1. `(foo 1)` 是复合表达式，先 eval 操作符`foo`，再 eval 操作数`(1)`，最后 apply 两者的结果
+
+    1. `foo` 的 eval 结果为 `<foo-proc>`
+
+2. 操作数`(1)`的 eval 结果为`(1)`
+
+3. apply 上面的结果
+
+    1. 新增 frame `{a->1}`，作为新的环境 E1: `{a->1} -> E0`
+
+    2. eval `<foo-proc>` 的内容 `['define', ...]`， E1 新增 frame `bar-><bar-proc>`，
+
+        1. eval `(bar 42)` in E1， 先 eval 操作符`bar`得到 `<bar-proc>`, 再 eval 操作数 `(42)` 得到 `(42)`
+
+        2. apply 上述结果
+
+            1. 新增 frame `{x->42}`，作为新的环境 E2: `{x->42} -> E1`
+
+            2. eval `(+ x a)` in E2，其中 x 在 E2 中绑定，a 在 E1 中绑定，所以，结果为42
+
+
 #### 高阶函数
+
+高阶函数是指一个函数的返回值为函数对象，而不是具体的值。
 
 ```scheme
 ** >> (define (f x)
@@ -341,7 +399,7 @@ SICP 3.2章:
 
 `((f 10))` 在环境 E0 的 eval/apply 步骤如下：
 
-1. `((f 10))` 是复合表达式（combination），先 eval 操作符`(f 10)`，再 eval 操作数`()`，最后 apply 两者的结果
+1. `((f 10))` 是复合表达式，先 eval 操作符`(f 10)`，再 eval 操作数`()`，最后 apply 两者的结果
  
     1. `(f 10)` 也是复合表达式, 先 eval 操作符`f` ，得到函数对象 `<f>`, 再 eval 操作数 `10`，结果为10
  
@@ -363,6 +421,8 @@ SICP 3.2章:
 #### 静态绑定 vs 动态绑定
 
 静态绑定也叫词汇绑定（lexical binding），
+
+Racket 例子如下：
 
 ```scheme
 > (let* ((a 1) (f (lambda (x) (+ x a))))
@@ -386,7 +446,7 @@ SICP 3.2章:
 
 1. 每次 apply 函数对象都会插入新的 frame 作为新的 eval 环境，不同环境间数据隔离。
 
-2. 局部函数可以通过父环境指针找到包裹它的所有变量绑定。
+2. 局部函数可以通过父环境指针找到“包裹”（enclosing）它的所有变量绑定。
 
 这两个特点可以让我们实现类似面向对象里的 class 的概念。
 
@@ -419,7 +479,6 @@ Racket 例子如下：
 ((B 'deposit) 10)                       ;90
 ```
 
-
 对应的 Python 代码：
 
 ```python
@@ -444,7 +503,7 @@ def make_account(balance):
     return dispatch
 ```
 
-每次遍历所有的 frame 有性能上不够高效，所以真实的解释器一般会借助于 lexical addressing 的策略，通过在 frame 上标注额外信息来快速定位到某一个 frame 。具体可参照 SICP 5.5.6。
+环境模型在实现上，需要遍历所有的 frame 才能查到某个变量，性能上不够高效，所以真实的解释器一般会借助于 lexical addressing 的策略，通过在 frame 上标注额外信息来快速定位到某一个 frame 。具体可参照 SICP 5.5.6。
 
 
 ## 读取-解释-输出循环（REPL）
