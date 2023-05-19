@@ -45,7 +45,7 @@ operands -> operand*
 operand -> "int"|"float"|"string"|expr
 ```
 
-这个语法包含4条生产规则（production rule），其中，双引号里的为终端符号（terminal symbol），`->` 左边的为非终端符号（nonterminal symbol），`->` 读为“可以有这样的形式：”。
+这个语法包含4条产生式规则（production rule）[^1]，其中，双引号里的为终端符号（terminal symbol），`->` 左边的为非终端符号（nonterminal symbol），`->` 读为“可以有这样的形式：”。
 
 一个表达式的形式为：使用括号包裹，包含一个 `operator` 以及0个或多个 `operand`，
 
@@ -56,7 +56,9 @@ operand -> "int"|"float"|"string"|expr
 
 ## 解析树（Parse tree）
 
-有了语法定义后，我们可以有一些句子（sentence），例如：`(string int int int)`，或者`(defun factorial (x))` 等等。针对一个句子，我们可以进行推导（derivation），从而得出一个解析树。
+有了语法定义后，我们可以生成一些句子（sentence），例如：`(string int int int)`，或者`(defun factorial (x))` 等等。
+
+针对一个句子，我们可以进行推导（derivation），从而得出一个解析树。
 
 第一个句子的推导如下：
 
@@ -123,3 +125,5 @@ def operand():
 ## 完整实现
 
 最后的完整实现可以参见[这个 Gist](https://gist.github.com/xiez/4551065f3168f9d1276ab9e0771313d6)，为了让代码尽量简洁，词法解析这块使用了`replace,split`而不是标准的正则解析。
+
+[^1]: "production"一词是由诺姆·乔姆斯基于1950年代中期提出的，作为他在生成式语法方面的工作的一部分。根据乔姆斯基的理论，生成式语法是一种可以生成（produce）语言中所有可能句子的规则系统。选择“production”这个术语是为了反映语法规则就像工厂一样，通过将更简单的元素组合成更复杂的结构来生成或产生句子的概念。就像工厂通过组装原材料生产商品一样，语法通过按照语言规则组装单词和短语来生成句子

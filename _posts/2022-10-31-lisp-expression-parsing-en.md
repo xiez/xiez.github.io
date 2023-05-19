@@ -48,7 +48,7 @@ operands -> operand*
 operand -> "int"|"float"|"string"|expr
 ```
 
-This syntax contains 4 **production rules**, where the one in double quotes is the **terminal symbol**, the one to the left of `->` is the **nonterminal symbol**, and `->` is read as "can have the form:".
+This syntax contains 4 **production rules**[^1], where the one in double quotes is the **terminal symbol**, the one to the left of `->` is the **nonterminal symbol**, and `->` is read as "can have the form:".
 
 An expression has the form: wrapped in parentheses, containing an `operator` and zero or more `operand`s.
 
@@ -126,3 +126,5 @@ Predictive parsing is the process of "predicting" which rule will be used by the
 ## Full implementation
 
 The final full implementation can be found in [this Gist](https://gist.github.com/xiez/4551065f3168f9d1276ab9e0771313d6). To keep the code as simple as possible, lexical parsing uses `replace, split` instead of the standard regular parsing.
+
+[^1]: The term "production" was introduced by Noam Chomsky in the mid-1950s, as part of his work on generative grammar. According to Chomsky, a generative grammar is a system of rules that can generate or produce all the possible sentences of a language. The term "production" was chosen to reflect the idea that the grammar rules are like factories that produce or generate sentences by combining simpler elements into more complex structures. Just as a factory produces goods by assembling raw materials, a grammar produces sentences by assembling words and phrases according to the rules of the language.
