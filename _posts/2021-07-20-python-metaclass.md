@@ -126,7 +126,7 @@ class Bar2(metaclass=MyMeta):
 
 `metaclass`, `class`, `object` 之间的关系可以如下图：
 
-![metaclass](https://github.com/xiez/xiez.github.io/raw/master/assets/images/2021/07/metaclass.png "metaclass")
+![metaclass](../../assets/images/2021/07/metaclass.png "metaclass")
 
 ## 应用场景
 

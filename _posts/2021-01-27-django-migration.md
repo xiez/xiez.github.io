@@ -18,7 +18,7 @@ migration 主要分为两部分：
 
 主要流程如下图：
 
-![django migrations](https://github.com/xiez/xiez.github.io/raw/master/assets/images/2021/01/dj_migrations.png "django migrations")
+![django migrations](../../assets/images/2021/01/dj_migrations.png "django migrations")
 
 下面就从源码层次分析下 Django Migration 系统的内部原理，Django 版本为 v1.11。
 
@@ -67,7 +67,7 @@ class MigrationLoader(object):
 
 `MigrationGraph` 本质上就是项目里所有 migration 文件的依赖关系图。图中的每一个节点 `Node` 代表一个 app 下的 migration 文件，例如 `('app_A, '0001_auto_20190822_0806')`
 
-![migration graph](https://github.com/xiez/xiez.github.io/raw/master/assets/images/2021/01/migation_graph.png "migration graph")
+![migration graph](../../assets/images/2021/01/migation_graph.png "migration graph")
 
 ```
 class MigrationGraph(object):

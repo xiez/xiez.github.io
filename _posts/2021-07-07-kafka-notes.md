@@ -40,7 +40,7 @@ kafka 依赖 zookeeper 来做一些关键操作（例如 leader 选举），以�
 
 当topic的写入速度超过了单节点的处理能力，可以把topic分割成多个 partition，分散到多个node节点并行处理。一个node节点可以存放多个partition。
 
-![node_partitions](https://github.com/xiez/xiez.github.io/raw/master/assets/images/2021/07/node_partitions.png "node partitions")
+![node_partitions](../../assets/images/2021/07/node_partitions.png "node partitions")
 
 consumer group里的 consumer 分别从某几个 partition 里读取数据。
 
@@ -56,7 +56,7 @@ consumer group里的一个consumer挂了，kafka会把相应的partition分配�
 
 消息分散到多个partition里，每个partition里的消息顺序单调递增。
 
-![offset](https://github.com/xiez/xiez.github.io/raw/master/assets/images/2021/07/offset.png "offset")
+![offset](../../assets/images/2021/07/offset.png "offset")
 
 0.9 版本以后，offset信息存在内部的topic里 [https://stackoverflow.com/questions/41137281/offsets-stored-in-zookeeper-or-kafka](https://stackoverflow.com/questions/41137281/offsets-stored-in-zookeeper-or-kafka)
 
@@ -76,7 +76,7 @@ ref: [https://www.youtube.com/watch?v=4n-f-cXhTv8&list=PLjNqVu1lCpIatt8KnZlmYVtm
 
 每个partition leader负责写入，leader可以有多个replica，分散到多个node，replica从leader拉取数据。
 
-![replication](https://github.com/xiez/xiez.github.io/raw/master/assets/images/2021/07/replication.png "replication")
+![replication](../../assets/images/2021/07/replication.png "replication")
 
 
 #### in-sync relicas(ISR)

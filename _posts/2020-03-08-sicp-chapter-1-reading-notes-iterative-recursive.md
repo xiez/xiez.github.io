@@ -19,8 +19,8 @@ tags:
 
 这段描述再配合上计算 factorial 的过程（process），展示了迭代和递归的区别。
 
-![iterative](https://raw.githubusercontent.com/xiez/xiez.github.io/master/assets/images/2020/03/iterative.gif "iterative process")
-![recursive](https://raw.githubusercontent.com/xiez/xiez.github.io/master/assets/images/2020/03/recursive.gif "recursive process")
+![iterative](../../assets/images/2020/03/iterative.gif "iterative process")
+![recursive](../../assets/images/2020/03/recursive.gif "recursive process")
 
 递归从“形状”上看，先增大再缩小；而迭代却是线性的。这里所谓的“形状”就是计算所需要的空间。
 

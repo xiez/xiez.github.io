@@ -16,7 +16,7 @@ tags:
 
 该问题的一个解如下图：
 
-![8-queens](https://raw.githubusercontent.com/xiez/xiez.github.io/master/assets/images/2022/10/n-queens.png "8 queens")
+![8-queens](../../assets/images/2022/10/n-queens.png "8 queens")
 
 八皇后或者N皇后问题一般分为寻找所有解法或者某一种解法。
 
